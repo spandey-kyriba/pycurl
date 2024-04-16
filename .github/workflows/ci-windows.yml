@@ -24,8 +24,6 @@ jobs:
     runs-on: windows-2022
     env:
       VCPKG_BINARY_SOURCES: 'clear;nuget,GitHub,readwrite'
-      VCPKG_ROOT: 'c:\vcpkg'
-      VCPKG_INSTALLATION_ROOT: 'c:\vcpkg'
     strategy:
       matrix:
         arch: ["x64"]
@@ -68,7 +66,6 @@ jobs:
         #vcpkg install curl[core,non-http,openssl]:${{ matrix.arch }}-windows
     - name: Install dependencies
       run: |
-        Get-ChildItem -Recurse "C:\vcpkg\"
         python -m pip install --upgrade pip
         pip install wheel delvewheel
         pip install flake8 pytest -r requirements-dev.txt
@@ -82,7 +79,7 @@ jobs:
         python setup.py --link-arg=/LIBPATH:C:/vcpkg/packages/openssl_${{ matrix.arch }}-windows --link-arg=libssl.lib --link-arg=libcrypto.lib bdist_wheel
     - name: Repair & install built wheel
       run: |
-        delvewheel repair --add-path "$VCPKG_INSTALLATION_ROOT/installed/${{ matrix.arch }}-windows/bin;$VCPKG_INSTALLATION_ROOT/installed/${{ matrix.arch }}-windows/lib" dist/*.whl
+        delvewheel repair --add-path "$VCPKG_INSTALLATION_ROOT/installed/${{ matrix.arch }}-windows/bin;C:/vcpkg/packages/openssl_${{ matrix.arch }}-windows/lib" dist/*.whl
         pip install wheelhouse/*.whl
       shell: bash
     - name: Test with pytest
