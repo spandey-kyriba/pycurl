@@ -68,18 +68,11 @@ jobs:
         python -m pip install --upgrade pip
         pip install wheel delvewheel
         pip install flake8 pytest -r requirements-dev.txt
-    - name: Download openssl source
-      run: |
-        $url="https://www.openssl.org/source/old/1.1.1/openssl-1.1.1n.tar.gz"
-        $path="D:\openssl-download"
-        New-Item -ItemType Directory -Path $path -Force
-        (New-Object System.Net.WebClient).DownloadFile($URL, "$path\openssl-1.1.1n.tar.gz")
-        python -c "import tarfile;file = tarfile.open('d:/openssl-download/openssl-1.1.1n.tar.gz');file.extractall('d:/openssl-download/openssl');file.close()"
     - name: Build
       env:
         PYCURL_SSL_LIBRARY: openssl
         PYCURL_CURL_DIR: 'C:/vcpkg/packages/curl_${{ matrix.arch }}-windows'
-        PYCURL_OPENSSL_DIR: 'd:/openssl-download/openssl/openssl-1.1.1n'
+        PYCURL_OPENSSL_DIR: 'C:/vcpkg/packages/openssl_${{ matrix.arch }}-windows'
       run: |
         python setup.py bdist_wheel
     - name: Repair & install built wheel
