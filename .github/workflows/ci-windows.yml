@@ -77,7 +77,7 @@ jobs:
         python setup.py --link-arg=/LIBPATH:C:/vcpkg/packages/openssl_${{ matrix.arch }}-windows --link-arg=libssl.lib --link-arg=libcrypto.lib bdist_wheel
     - name: Repair & install built wheel
       run: |
-        delvewheel repair --add-path "$VCPKG_INSTALLATION_ROOT/installed/${{ matrix.arch }}-windows/bin;C:/vcpkg/packages/openssl_${{ matrix.arch }}-windows/lib" dist/*.whl
+        delvewheel repair --ignore-in-wheel --add-path "$VCPKG_INSTALLATION_ROOT/installed/${{ matrix.arch }}-windows/bin;C:/vcpkg/packages/openssl_${{ matrix.arch }}-windows/lib" dist/*.whl
         pip install wheelhouse/*.whl
       shell: bash
     - name: Test with pytest
