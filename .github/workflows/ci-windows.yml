@@ -79,7 +79,7 @@ jobs:
       env:
         PYCURL_SSL_LIBRARY: openssl
         PYCURL_CURL_DIR: 'C:/vcpkg/packages/curl_${{ matrix.arch }}-windows'
-        OPENSSL_DIR: 'd:/openssl-download/openssl/openssl-1.1.1n'
+        PYCURL_OPENSSL_DIR: 'd:/openssl-download/openssl/openssl-1.1.1n'
       run: |
         python setup.py bdist_wheel
     - name: Repair & install built wheel
