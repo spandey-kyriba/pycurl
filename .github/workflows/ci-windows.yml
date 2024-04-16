@@ -65,6 +65,8 @@ jobs:
         #vcpkg install curl[core,non-http,openssl]:${{ matrix.arch }}-windows
     - name: Install dependencies
       run: |
+        dir /s C:/vcpkg/packages/curl_x64-windows/
+        dir /s C:/vcpkg/packages/openssl_x64-windows/
         python -m pip install --upgrade pip
         pip install wheel delvewheel
         pip install flake8 pytest -r requirements-dev.txt
@@ -75,7 +77,7 @@ jobs:
         PYCURL_OPENSSL_DIR: 'C:/vcpkg/packages/openssl_${{ matrix.arch }}-windows'
         PYCURL_OPENSSL_LIB_NAME: 'libssl.lib'
       run: |
-        python setup.py bdist_wheel
+        python setup.py --with-openssl bdist_wheel
     - name: Repair & install built wheel
       run: |
         delvewheel repair --add-path $VCPKG_INSTALLATION_ROOT/installed/${{ matrix.arch }}-windows/bin dist/*.whl
