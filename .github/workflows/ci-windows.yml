@@ -56,8 +56,13 @@ jobs:
         "${nuget}" \
           setapikey "${{ secrets.GITHUB_TOKEN }}" \
           -source "https://nuget.pkg.github.com/${GITHUB_REPOSITORY_OWNER}/index.json"
+    C:\vcpkg\vcpkg.exe
+    - name: 'vcpkg openssl version'
+      shell: 'bash'
+      run: |
+        echo '{"overrides": [{"name": "openssl","version": "1.1.1n"}]}' > C:\vcpkg\vcpkg.json
     - name: Install packages
-      run: vcpkg install curl[core,non-http,openssl-windows]:${{ matrix.arch }}-windows
+      run: vcpkg install curl[core,non-http,openssl]:${{ matrix.arch }}-windows
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
