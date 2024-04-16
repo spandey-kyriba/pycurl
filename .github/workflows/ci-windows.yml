@@ -58,8 +58,6 @@ jobs:
           -source "https://nuget.pkg.github.com/${GITHUB_REPOSITORY_OWNER}/index.json"
     - name: Install packages
       run: |
-        mkdir curl-install-openssl
-        cd curl-install-openssl
         vcpkg new --application
         vcpkg add port curl[core,non-http,openssl]
         echo '{"dependencies": [{"name": "curl","default-features": false, "features": ["non-http","openssl"]}],"overrides": [{"name": "openssl","version": "1.1.1n"}]}' > .\vcpkg.json
@@ -74,7 +72,14 @@ jobs:
       env:
         PYCURL_SSL_LIBRARY: openssl
         PYCURL_CURL_DIR: 'C:/vcpkg/packages/curl_${{ matrix.arch }}-windows'
+        OPENSSL_DIR: 'D:/a/pycurl/openssl-download/openssl/openssl-1.1.1n'
       run: |
+        
+        $url="https://www.openssl.org/source/old/1.1.1/openssl-1.1.1n.tar.gz"
+        $path="D:\a\pycurl\openssl-download"
+        mkdir $path
+        (New-Object System.Net.WebClient).DownloadFile($URL, "$path\openssl-1.1.1n.tar.gz")
+        python -c "import tarfile;file = tarfile.open(r'D:\a\pycurl\openssl-download\openlssl-1.1.1n.tar.gz');file.extractall(r'D:\a\pycurl\openssl-download\openssl');file.close()"
         python setup.py bdist_wheel
     - name: Repair & install built wheel
       run: |
