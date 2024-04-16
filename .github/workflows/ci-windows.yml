@@ -20,7 +20,6 @@ concurrency:
 
 jobs:
   build:
-
     runs-on: windows-2022
     env:
       VCPKG_BINARY_SOURCES: 'clear;nuget,GitHub,readwrite'
@@ -57,11 +56,10 @@ jobs:
           setapikey "${{ secrets.GITHUB_TOKEN }}" \
           -source "https://nuget.pkg.github.com/${GITHUB_REPOSITORY_OWNER}/index.json"
     - name: Install packages
-      
       run: |
         vcpkg new --application
         vcpkg add port curl[core,non-http,openssl]
-        echo '{"dependencies": [{"name": "curl","default-features": false, "features": ["core","non-http","openssl"]}],"overrides": [{"name": "openssl","version": "1.1.1n"}]}' > .\vcpkg.json
+        echo '{"dependencies": [{"name": "curl","default-features": false, "features": ["non-http","openssl"]}],"overrides": [{"name": "openssl","version": "1.1.1n"}]}' > .\vcpkg.json
         vcpkg install
         #vcpkg install curl[core,non-http,openssl]:${{ matrix.arch }}-windows
     - name: Install dependencies
