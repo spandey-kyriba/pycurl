@@ -75,9 +75,9 @@ jobs:
         PYCURL_SSL_LIBRARY: openssl
         PYCURL_CURL_DIR: 'C:/vcpkg/packages/curl_${{ matrix.arch }}-windows'
         PYCURL_OPENSSL_DIR: 'C:/vcpkg/packages/openssl_${{ matrix.arch }}-windows'
-        PYCURL_OPENSSL_LIB_NAME: 'libcrypto.lib/libssl.lib'
+        #PYCURL_OPENSSL_LIB_NAME: 'libssl.lib'
       run: |
-        python setup.py bdist_wheel
+        python setup.py --openssl-lib-name="" bdist_wheel
     - name: Repair & install built wheel
       run: |
         delvewheel repair --add-path $VCPKG_INSTALLATION_ROOT/installed/${{ matrix.arch }}-windows/bin dist/*.whl
