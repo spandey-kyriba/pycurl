@@ -56,7 +56,6 @@ jobs:
         "${nuget}" \
           setapikey "${{ secrets.GITHUB_TOKEN }}" \
           -source "https://nuget.pkg.github.com/${GITHUB_REPOSITORY_OWNER}/index.json"
-    C:\vcpkg\vcpkg.exe
     - name: 'vcpkg openssl version'
       shell: 'bash'
       run: |
