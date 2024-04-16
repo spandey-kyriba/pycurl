@@ -27,7 +27,7 @@ jobs:
     strategy:
       matrix:
         arch: ["x64"]
-        python-version: ["3.11"]
+        python-version: ["3.11.2"]
       fail-fast: false
     permissions:
       packages: write
