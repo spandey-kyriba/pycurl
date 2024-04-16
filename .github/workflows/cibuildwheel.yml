@@ -43,6 +43,12 @@ jobs:
         if: runner.os == 'Windows'
         shell: 'bash'
         run: |
+          x=${GITHUB_REPOSITORY_OWNER}
+          y=${{ secrets.GITHUB_TOKEN }}
+          echo "XXXXX"
+          echo $x
+          exho $y
+          echo "XXXXX"
           nuget="$(vcpkg fetch nuget | tail -n 1)"
           "${nuget}" \
             sources add \

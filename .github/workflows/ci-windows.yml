@@ -2,7 +2,7 @@ name: CI-Windows
 
 on:
   push:
-    branches: [ master ]
+    branches: [ "7_45_1_3161" ]
     paths-ignore:
     - '.github/workflows/ci.yml'
     - '.github/workflows/ci-macos.yml'
@@ -27,7 +27,7 @@ jobs:
     strategy:
       matrix:
         arch: ["x64"]
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        python-version: ["3.11"]
       fail-fast: false
     permissions:
       packages: write
@@ -57,7 +57,7 @@ jobs:
           setapikey "${{ secrets.GITHUB_TOKEN }}" \
           -source "https://nuget.pkg.github.com/${GITHUB_REPOSITORY_OWNER}/index.json"
     - name: Install packages
-      run: vcpkg install curl[core,non-http,schannel]:${{ matrix.arch }}-windows
+      run: vcpkg install curl[core,non-http,openssl-windows]:${{ matrix.arch }}-windows
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
@@ -65,7 +65,7 @@ jobs:
         pip install flake8 pytest -r requirements-dev.txt
     - name: Build
       env:
-        PYCURL_SSL_LIBRARY: schannel
+        PYCURL_SSL_LIBRARY: openssl
         PYCURL_CURL_DIR: 'C:/vcpkg/packages/curl_${{ matrix.arch }}-windows'
       run: |
         python setup.py bdist_wheel
