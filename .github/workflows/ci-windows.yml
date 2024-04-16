@@ -56,12 +56,15 @@ jobs:
         "${nuget}" \
           setapikey "${{ secrets.GITHUB_TOKEN }}" \
           -source "https://nuget.pkg.github.com/${GITHUB_REPOSITORY_OWNER}/index.json"
-    - name: 'vcpkg openssl version'
-      shell: 'bash'
-      run: |
-        echo '{"overrides": [{"name": "openssl","version": "1.1.1n"}]}' > C:\vcpkg\vcpkg.json
     - name: Install packages
-      run: vcpkg install curl[core,non-http,openssl]:${{ matrix.arch }}-windows
+      run: |
+        mkdir curl-install-openssl
+        cd curl-install-openssl
+        vcpkg new --application
+        vcpkg add port curl[core,non-http,openssl]
+        echo '{"dependencies": [{"name": "curl","default-features": false, "features": ["non-http","openssl"]}],"overrides": [{"name": "openssl","version": "1.1.1n"}]}' > .\vcpkg.json
+        vcpkg install
+        #vcpkg install curl[core,non-http,openssl]:${{ matrix.arch }}-windows
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
