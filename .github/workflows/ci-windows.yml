@@ -2,7 +2,7 @@ name: CI-Windows
 
 on:
   push:
-    branches: [ master ]
+    branches: [ "7_45_3_3161" ]
     paths-ignore:
     - '.github/workflows/ci.yml'
     - '.github/workflows/ci-macos.yml'
@@ -20,14 +20,13 @@ concurrency:
 
 jobs:
   build:
-
     runs-on: windows-2022
     env:
       VCPKG_BINARY_SOURCES: 'clear;nuget,GitHub,readwrite'
     strategy:
       matrix:
         arch: ["x64"]
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        python-version: ["3.11.2"]
       fail-fast: false
     permissions:
       packages: write
@@ -57,7 +56,19 @@ jobs:
           setapikey "${{ secrets.GITHUB_TOKEN }}" \
           -source "https://nuget.pkg.github.com/${GITHUB_REPOSITORY_OWNER}/index.json"
     - name: Install packages
-      run: vcpkg install curl[core,non-http,schannel]:${{ matrix.arch }}-windows
+      run: |
+        vcpkg new --application
+        vcpkg add port libssh2[openssl,zlib] curl[non-http,openssl,ssh,http2,idn2,c-ares,zstd]
+        echo '{"dependencies": [{"name": "openssl"},{"name": "libssh2","default-features": false,"features": ["openssl","zlib"]},{"name": "curl","default-features": false,"features": ["non-http","openssl","ssh","http2","c-ares","idn2","zstd"]}], "overrides": [{"name": "openssl", "version-string": "3.0.8", "port-version": 2}] }' > .\vcpkg.json
+        vcpkg install --only-downloads
+        # build openssl with ssl3 and weak ciphers
+        $opensslcmake="C:\Users\runneradmin\AppData\Local\vcpkg\registries\git-trees\3fbd85566107cc3a76ed800844569f1a7503f9d6\portfile.cmake"
+        $contentcmake=$(gc $opensslcmake | % {$_ -replace "no-ssl3","enable-ssl3"} | % {$_ -replace "no-weak-ssl-ciphers", "enable-weak-ssl-ciphers"} )
+        $contentcmake | Out-File $opensslcmake
+        gc $opensslcmake
+        vcpkg install  --no-binarycaching
+        gc $opensslcmake
+        #vcpkg install libssh2[openssl,zlib] curl[non-http,openssl,ssh,http2,idn2,c-ares,zstd]
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
@@ -65,13 +76,30 @@ jobs:
         pip install flake8 pytest -r requirements-dev.txt
     - name: Build
       env:
-        PYCURL_SSL_LIBRARY: schannel
+        PYCURL_SSL_LIBRARY: openssl
         PYCURL_CURL_DIR: 'C:/vcpkg/packages/curl_${{ matrix.arch }}-windows'
+        PYCURL_OPENSSL_DIR: 'C:/vcpkg/packages/openssl_${{ matrix.arch }}-windows'
+        PYCURL_OPENSSL_LIB_NAME: 'libssl.lib'
       run: |
-        python setup.py bdist_wheel
+        # display the buit packages
+        python setup.py `
+          --link-arg=/LIBPATH:C:/vcpkg/packages/zstd_${{ matrix.arch }}-windows/lib `
+          --link-arg=/LIBPATH:C:/vcpkg/packages/c-ares_${{ matrix.arch }}-windows/lib `
+          --link-arg=/LIBPATH:C:/vcpkg/packages/libssh2_${{ matrix.arch }}-windows/lib `
+          --link-arg=/LIBPATH:C:/vcpkg/packages/openssl_${{ matrix.arch }}-windows/lib `
+          --link-arg=/LIBPATH:C:/vcpkg/packages/nghttp2_${{ matrix.arch }}-windows/lib `
+          --link-arg=/LIBPATH:C:/vcpkg/packages/libidn2_${{ matrix.arch }}-windows/lib `
+          --link-arg=libssl.lib `
+          --link-arg=libcrypto.lib `
+          --link-arg=libssh2.lib `
+          --link-arg=zstd.lib `
+          --link-arg=cares.lib `
+          --link-arg=nghttp2.lib `
+          --link-arg=idn2.lib `
+          bdist_wheel
     - name: Repair & install built wheel
       run: |
-        delvewheel repair --add-path $VCPKG_INSTALLATION_ROOT/installed/${{ matrix.arch }}-windows/bin dist/*.whl
+        delvewheel repair --add-path "$VCPKG_INSTALLATION_ROOT/installed/${{ matrix.arch }}-windows/bin;C:/vcpkg/packages/curl_${{ matrix.arch }}-windows/bin;C:/vcpkg/packages/openssl_${{ matrix.arch }}-windows/bin;C:/vcpkg/packages/zstd_${{ matrix.arch }}-windows/bin;C:/vcpkg/packages/c-ares_${{ matrix.arch }}-windows/bin;C:/vcpkg/packages/libssh2_${{ matrix.arch }}-windows/bin/;C:/vcpkg/packages/nghttp2_${{ matrix.arch }}-windows/bin;C:/vcpkg/packages/libidn2_${{ matrix.arch }}-windows/bin" dist/*.whl
         pip install wheelhouse/*.whl
       shell: bash
     - name: Test with pytest
