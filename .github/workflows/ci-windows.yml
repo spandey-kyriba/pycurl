@@ -74,7 +74,7 @@ jobs:
         $path="D:\openssl-download"
         New-Item -ItemType Directory -Path $path -Force
         (New-Object System.Net.WebClient).DownloadFile($URL, "$path\openssl-1.1.1n.tar.gz")
-        python -c "import tarfile;file = tarfile.open('d:/openssl-download/openlssl-1.1.1n.tar.gz');file.extractall('d:/openssl-download/openssl');file.close()"
+        python -c "import tarfile;file = tarfile.open('d:/openssl-download/openssl-1.1.1n.tar.gz');file.extractall('d:/openssl-download/openssl');file.close()"
     - name: Build
       env:
         PYCURL_SSL_LIBRARY: openssl
