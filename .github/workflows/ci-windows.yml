@@ -65,8 +65,8 @@ jobs:
         #vcpkg install curl[core,non-http,openssl]:${{ matrix.arch }}-windows
     - name: Install dependencies
       run: |
-        dir /s C:/vcpkg/packages/curl_x64-windows/
-        dir /s C:/vcpkg/packages/openssl_x64-windows/
+        Get-ChildItem -Recurse "C:\vcpkg\packages\curl_x64-windows\"
+        Get-ChildItem -Recurse C:\vcpkg\packages\openssl_x64-windows\"
         python -m pip install --upgrade pip
         pip install wheel delvewheel
         pip install flake8 pytest -r requirements-dev.txt
