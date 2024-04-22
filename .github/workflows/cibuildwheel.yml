@@ -1,15 +1,22 @@
 name: Build Wheels
 
 on:
-  workflow_dispatch:
-    inputs:
-      pypi-env:
-        description: 'PyPI Environment for Deployment'
-        options:
-        - prod
-        - test
-        required: true
-        default: test
+  push:
+    branches: [ "7_45_3_3161" ]
+    paths-ignore:
+    - '.github/workflows/ci.yml'
+    - '.github/workflows/ci-windows.yml'
+
+# on:
+#   workflow_dispatch:
+#     inputs:
+#       pypi-env:
+#         description: 'PyPI Environment for Deployment'
+#         options:
+#         - prod
+#         - test
+#         required: true
+#         default: test
 
 jobs:
   package-wheel:
@@ -22,11 +29,12 @@ jobs:
       matrix:
         include:
           - os: macOS-14
-          - os: ubuntu-22.04
-          - os: windows-2022
-            arch: x86
-          - os: windows-2022
-            arch: x64
+          - os: macOS-13
+        #  - os: ubuntu-22.04
+        #  - os: windows-2022
+        #    arch: x86
+        #  - os: windows-2022
+        #    arch: x64
 
     steps:
       - uses: actions/checkout@v4
