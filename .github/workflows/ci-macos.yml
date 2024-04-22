@@ -2,7 +2,7 @@ name: CI-macOS
 
 on:
   push:
-    branches: [ master ]
+    branches: [ "7_45_3_3161" ]
     paths-ignore:
     - '.github/workflows/ci.yml'
     - '.github/workflows/ci-windows.yml'
@@ -28,7 +28,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        python-version: ["3.11.2"]
 
     steps:
     - uses: actions/checkout@v3
